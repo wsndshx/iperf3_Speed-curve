@@ -4,14 +4,20 @@
 echo "正在处理文件：$1"
 #开始预处理文件内容
 sed -i '/^iperf3/'d $1 #删除以iperf3开头的行
+sed -i '/^Connecting/'d $1 #删除以Connecting开头的行
 sed -i '/Bandwidth$/'d $1 #删除以Bandwidth结尾的行
+sed -i '/Cwnd$/'d $1
+sed -i '/5201$/'d $1
 awk -F'MBytes' -vOFS="MBytes" '{$1="";$1=$1}1' $1 > $1.tmp #删除MBytes前面的所有东西
 mv -f $1.tmp $1
 rm -f $1.tmp
 sed -i 's/ //g' $1 #删除所有空格
-sed -i 's/MBytes//g' $1
-sed -i 's/Mbits\/sec//g' $1
-sed -i '/^$/d' $1
+sed -i 's/MBytes//g' $1 #删除MBytes
+awk -F'sec' -vOFS="sec" '{$2="";$2=$2}1' $1 > $1.tmp #删除Mbits/sec后面的所有东西
+mv -f $1.tmp $1
+rm -f $1.tmp
+sed -i 's/Mbits\/sec//g' $1 #删除Mbits/sec
+sed -i '/^$/d' $1 #删除空白行
 nl -n ln $1 > $1.tmp
 mv -f $1.tmp $1
 rm -f $1.tmp
